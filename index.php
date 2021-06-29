@@ -4,19 +4,15 @@ $apiPrefix = "https://api.vindecoder.eu/3.1";
 $apikey = "652dbbbced43";   // Your API key
 $secretkey = "a50ce28f9d";  // Your secret key
 $id = "info";
-// $vin = mb_strtoupper("XXXDEF1GH23456789");
 $vin = $_GET['vin'];
 
 $controlsum = substr(sha1("{$vin}|{$id}|{$apikey}|{$secretkey}"), 0, 10);
 
 $data = file_get_contents("{$apiPrefix}/{$apikey}/{$controlsum}/decode/info/{$vin}.json", false);
-// $result = json_decode($data, true);
 
-// WAUZZZ4BZWN049087
-
-// XXXDEF1GH23456789
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +49,7 @@ input {
   </header>
   <footer>
     <div class="test">
-      <form id="test" action="decode.php" method="GET">
+      <form id="test" action="index.php" method="GET">
         <input type="text" maxlength="17" minlength="17" id="vin" name="vin">
         <button id="submit" type="submit">Submit</button>
       </form>
@@ -62,25 +58,28 @@ input {
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 
   <script>
-
-  let data = <?=$data ?>
-
-  let dataArr = Object.values(data)
-
-  console.log(dataArr);
-
-  document.querySelector('#submit').addEventListener('click', e => {
-    
+  document.querySelector('#submit').addEventListener('click', function(e) {
+    e.preventDefault();
     let vin = document.querySelector('#vin').value.toUpperCase()
+    $.ajax({
+      url: './info-decode.php',
+      method: 'GET',
+      dataType: 'json',
+      data: {
+        vin: vin
+      },
+      success: function(data) {
+        let dataArr = Object.values(data)
 
-    console.log(vin);
+        dataArr[2].map(el => {
+          document.body.insertAdjacentHTML('afterend', `<div> ${el} </div>`)
+        })
+      }
+
+    });
   })
-
-  // console.log(dataArr[2].map(el => {
-  //   document.body.insertAdjacentHTML('afterbegin' ,`<div> ${el} </div>`)
-  // }));
-
   </script>
+
 </body>
 
 </html>
